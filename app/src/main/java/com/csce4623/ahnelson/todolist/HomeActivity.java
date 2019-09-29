@@ -1,6 +1,7 @@
 package com.csce4623.ahnelson.todolist;
 
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
@@ -8,9 +9,16 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
+//import  com.csce4623.ahnelson.todolist.ToDoListActivity;
 
 //Create HomeActivity and implement the OnClick listener
 public class HomeActivity extends AppCompatActivity implements View.OnClickListener{
+
+  //   ToDoListActivity toDoListAct = new ToDoListActivity();
+
+    public HomeActivity(){
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,22 +33,33 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
 
     }
-
+    int temp =0;
     @Override
     public void onClick(View v){
         switch (v.getId()){
             //If new Note, call createNewNote()
             case R.id.btnNewNote:
+                this.goToDoListActivity();
                 createNewNote();
+
                 break;
             //If delete note, call deleteNewestNote()
             case R.id.btnDeleteNote:
                 deleteNewestNote();
                 break;
+            case R.id.btnSave:
+
+                temp ++;
+                break;
             //This shouldn't happen
             default:
+                temp ++;
                 break;
         }
+    }
+    void goToDoListActivity(){
+        Intent toDoListIntent = new Intent(this, ToDoListActivity.class);
+        startActivity(toDoListIntent);
     }
 
     //Create a new note with the title "New Note" and content "Note Content"

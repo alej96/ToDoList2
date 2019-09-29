@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.csce4623.ahnelson.todolist.HomeActivity">
+    tools:context="com.csce4623.ahnelson.todolist.ToDoListActivity">
 
-    <TextView
+    <EditText
         android:id="@+id/tvNoteTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -15,9 +15,13 @@
         android:layout_marginTop="8dp"
         android:text="Note_Title"
         android:textSize="24sp"
+        android:maxLength="25"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:maxLines="1"
+        android:inputType="text"
+        />
 
     <EditText
         android:id="@+id/etNoteContent"
