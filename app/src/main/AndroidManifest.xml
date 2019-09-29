@@ -24,6 +24,8 @@
             android:authorities="com.csce4623.ahnelson.todolist.todoprovider"
             android:enabled="true"
             android:exported="true" />
+        <receiver android:name="model.AlarmReceiver" />
     </application>
+
 
 </manifest>
