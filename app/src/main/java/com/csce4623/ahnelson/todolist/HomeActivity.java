@@ -9,12 +9,13 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
-//import  com.csce4623.ahnelson.todolist.ToDoListActivity;
+import  com.csce4623.ahnelson.todolist.model.AlarmReceiver;
 
 //Create HomeActivity and implement the OnClick listener
 public class HomeActivity extends AppCompatActivity implements View.OnClickListener{
 
   //   ToDoListActivity toDoListAct = new ToDoListActivity();
+    AlarmReceiver alarmReceiver = new AlarmReceiver();
 
     public HomeActivity(){
 
@@ -32,8 +33,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.btnDeleteNote).setOnClickListener(this);
 
 
+
     }
-    int temp =0;
     @Override
     public void onClick(View v){
         switch (v.getId()){
@@ -41,19 +42,13 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btnNewNote:
                 this.goToDoListActivity();
                 createNewNote();
-
                 break;
             //If delete note, call deleteNewestNote()
             case R.id.btnDeleteNote:
                 deleteNewestNote();
                 break;
-            case R.id.btnSave:
-
-                temp ++;
-                break;
             //This shouldn't happen
             default:
-                temp ++;
                 break;
         }
     }
@@ -80,6 +75,26 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         Cursor myCursor = getContentResolver().query(ToDoProvider.CONTENT_URI,projection,null,null,null);
         //Create a toast message which states the number of rows currently in the database
         Toast.makeText(getApplicationContext(),Integer.toString(myCursor.getCount()),Toast.LENGTH_LONG).show();
+    }
+
+    //Create a new note with the that passes a tittle and content as parameters
+    void createNewNote(String title, String content){
+        //Create a ContentValues object
+        ContentValues myCV = new ContentValues();
+        //Put key_value pairs based on the column names, and the values
+        myCV.put(ToDoProvider.TODO_TABLE_COL_TITLE, title);
+        myCV.put(ToDoProvider.TODO_TABLE_COL_CONTENT, content);
+        //Perform the insert function using the ContentProvider
+        getContentResolver().insert(ToDoProvider.CONTENT_URI,myCV);
+        //Set the projection for the columns to be returned
+        String[] projection = {
+                ToDoProvider.TODO_TABLE_COL_ID,
+                ToDoProvider.TODO_TABLE_COL_TITLE,
+                ToDoProvider.TODO_TABLE_COL_CONTENT};
+        //Perform a query to get all rows in the DB
+        Cursor myCursor = getContentResolver().query(ToDoProvider.CONTENT_URI,projection,null,null,null);
+        //Create a toast message which states the number of rows currently in the database
+        Toast.makeText(getApplicationContext(),"content added! " + Integer.toString(myCursor.getCount()),Toast.LENGTH_LONG).show();
     }
 
     //Delete the newest note placed into the database
