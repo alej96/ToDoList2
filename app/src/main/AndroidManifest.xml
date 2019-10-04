@@ -13,8 +13,9 @@
         <activity android:name=".HomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
+                <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.LAUNCHER" />
+
             </intent-filter>
         </activity>
         <activity android:name=".ToDoListActivity"></activity>
@@ -24,7 +25,12 @@
             android:authorities="com.csce4623.ahnelson.todolist.todoprovider"
             android:enabled="true"
             android:exported="true" />
-        <receiver android:name="model.AlarmReceiver" />
+        <receiver
+            android:name=".model.Alarm_Receiver"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":remote"
+            />
     </application>
 
 

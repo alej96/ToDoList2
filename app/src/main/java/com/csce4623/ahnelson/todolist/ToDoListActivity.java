@@ -1,29 +1,35 @@
 package com.csce4623.ahnelson.todolist;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
+import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 import android.util.Log;
-import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.TimePicker;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 
+import com.csce4623.ahnelson.todolist.model.Alarm_Receiver;
+
 import java.util.Calendar;
-import com.csce4623.ahnelson.todolist.HomeActivity;
-import  com.csce4623.ahnelson.todolist.model.AlarmReceiver;
+import java.util.Date;
 
 public class ToDoListActivity extends AppCompatActivity implements View.OnClickListener{
 
     private static String TAG = ToDoListActivity.class.getName();
     HomeActivity homeActivity = new HomeActivity();
-    AlarmReceiver alarmReceiver = new AlarmReceiver();
+    Alarm_Receiver alarmReceiver = new Alarm_Receiver();
+    Context context;
+    PendingIntent pendingIntent;
+    Intent alarmIntent;
 
     String contentNote , titleNote, alarmTimeNote;
 
@@ -37,6 +43,9 @@ public class ToDoListActivity extends AppCompatActivity implements View.OnClickL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.note_activity);
         initializeComponents();
+
+        //change title of screen
+        setTitle("Edit To Do List");
     }
 
 
@@ -51,6 +60,9 @@ public class ToDoListActivity extends AppCompatActivity implements View.OnClickL
         txtDate = getDateEditText();
         txtTime = getTimeEditText();
 
+        //initialize alarm manager
+      //  this.context = this;
+
     }
 
 
@@ -59,7 +71,26 @@ public class ToDoListActivity extends AppCompatActivity implements View.OnClickL
             //If save clicked, go back to main activity and add the reminder
             case R.id.btnSave:
                saveNewNote();
-               goToHomeActivity();
+               this.start(mYear, mMonth, mDay, mHour, mMinute);
+
+//               //create a pending intent that delays the intent
+//                //unitl the specified calendar time
+//                pendingIntent = PendingIntent.getBroadcast(ToDoListActivity.this, 0,
+//                        alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+//
+//                //set alarm manager
+//                alarmManager.set(AlarmManager.RTC_WAKEUP, calendarTime.getTimeMillis(),
+//                        pendingIntent);
+
+                //Send data to HomeActivity
+                Intent intent = new Intent();
+                intent.putExtra("titleText", titleNote);
+                intent.putExtra("contentText", contentNote);
+                intent.putExtra("dateText", stringDate);
+                intent.putExtra("timeText", stringTime);
+
+                setResult(RESULT_OK, intent);
+                finish();
                 break;
             //This shouldn't happen
             case R.id.btn_date:
@@ -91,6 +122,12 @@ public class ToDoListActivity extends AppCompatActivity implements View.OnClickL
                 mHour = ctime.get(Calendar.HOUR_OF_DAY);
                 mMinute = ctime.get(Calendar.MINUTE);
 
+                //convert 24-hour time to 12 hour time
+                if(Calendar.HOUR_OF_DAY  > 12){
+
+                }
+
+
                 // Launch Time Picker Dialog
                 TimePickerDialog timePickerDialog = new TimePickerDialog(this,
                         new TimePickerDialog.OnTimeSetListener() {
@@ -111,21 +148,63 @@ public class ToDoListActivity extends AppCompatActivity implements View.OnClickL
         Toast.makeText(getApplicationContext(),"Note Saved!",Toast.LENGTH_LONG).show();
         contentNote = this.getNoteContentEditText().getText().toString();
         titleNote = this.getTitleNoteEditText().getText().toString();
-        alarmTimeNote = this.getAlarmTimeEditText().getText().toString();
         stringDate =  this.getDateEditText().getText().toString();
         stringTime = this.getTimeEditText().getText().toString();
 
         Log.i(TAG, "Debug: Note!->" + contentNote + titleNote + alarmTimeNote);
         Log.i(TAG, "Debug: Time/Date!->" + stringDate + stringTime);
 
-        alarmReceiver.start(mYear, mMonth, mDay, mHour, mMinute);
+       //=====// alarmReceiver.start(mYear, mMonth, mDay, mHour, mMinute);
 
-     //   homeActivity.createNewNote(titleNote, contentNote);
+      //  homeActivity.createNewNote(titleNote, contentNote, stringDate, stringTime);
+       // homeActivity.addToArrayList(titleNote, contentNote);
     }
 
     void goToHomeActivity(){
         Intent toDoListIntent = new Intent(this, HomeActivity.class);
         startActivity(toDoListIntent);
+    }
+
+
+    public void start(int mYear, int mMonth, int mDay, int mHour, int mMinute) {
+        AlarmManager manager;
+        if(Build.VERSION.SDK_INT>=23) {
+            manager = (AlarmManager) getApplicationContext().getSystemService(AlarmManager.class);
+        }else{
+            manager = (AlarmManager) getApplicationContext().getSystemService(ALARM_SERVICE);
+        }
+
+
+        Date dat = new Date();
+        Calendar cal_alarm = Calendar.getInstance();
+        Calendar cal_now = Calendar.getInstance(); //get date of alarm
+        cal_now.setTime(dat);
+        cal_alarm.setTime(dat);
+
+        //Set date
+        cal_alarm.set(Calendar.YEAR,mYear);
+        cal_alarm.set(Calendar.MONTH,mMonth);
+        cal_alarm.set(Calendar.DAY_OF_MONTH,mDay);
+
+        //Set time
+        cal_alarm.set(Calendar.HOUR_OF_DAY,mHour); //hour from app
+        cal_alarm.set(Calendar.MINUTE,mMinute); //get minute from app
+        cal_alarm.set(Calendar.SECOND,0);
+
+
+        if(cal_alarm.before(cal_now)){
+            cal_alarm.add(Calendar.DATE,1);
+        }
+
+        //Display  notification!
+        alarmIntent = new Intent(ToDoListActivity.this, Alarm_Receiver.class);
+        alarmIntent.putExtra("notificationMsg",titleNote);
+        pendingIntent = PendingIntent.getBroadcast(ToDoListActivity.this, 0, alarmIntent, 0);
+        Log.i("ToDoActivity", "Alarm Created");
+        //Fire alarm at the time specified
+        //cal_alarm should be the calendar variable
+        manager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime()+6000, pendingIntent);
+       // manager.setExact(AlarmManager.RTC_WAKEUP,cal_alarm.getTimeInMillis(), pendingIntent);
     }
 
     //Get the Information of the note (title, content, date)
@@ -135,9 +214,7 @@ public class ToDoListActivity extends AppCompatActivity implements View.OnClickL
     private EditText getTitleNoteEditText() {
         return (EditText) this.findViewById(R.id.tvNoteTitle);
     }
-    private EditText getAlarmTimeEditText() {
-        return (EditText) this.findViewById(R.id.etDatePicker);
-    }
+
     private EditText getDateEditText() {
         return (EditText) this.findViewById(R.id.in_date);
     }

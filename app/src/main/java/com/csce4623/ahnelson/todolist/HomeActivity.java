@@ -8,14 +8,26 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Toast;
-import  com.csce4623.ahnelson.todolist.model.AlarmReceiver;
+
+import android.widget.ListView;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 //Create HomeActivity and implement the OnClick listener
 public class HomeActivity extends AppCompatActivity implements View.OnClickListener{
 
+    private static String TAG = ToDoListActivity.class.getName();
+
   //   ToDoListActivity toDoListAct = new ToDoListActivity();
-    AlarmReceiver alarmReceiver = new AlarmReceiver();
+    ListView listNotes;
+    ArrayList<String> arrayNotes;
+    ArrayAdapter<String> adapter;
+
+    String hmTitle, hmContent, hmTime, hmDate;
 
     public HomeActivity(){
 
@@ -32,8 +44,22 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.btnNewNote).setOnClickListener(this);
         findViewById(R.id.btnDeleteNote).setOnClickListener(this);
 
+         listNotes = (ListView) findViewById(R.id.all_toDo_lists);
+         arrayNotes = new ArrayList<String>();
+         adapter = new ArrayAdapter<String>(HomeActivity.this, android.R.layout.simple_gallery_item,
+                 arrayNotes);
 
+        listNotes.setAdapter(adapter);
 
+        listNotes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                    Toast.makeText(getApplicationContext(), "Item List Clicked! At position: " +
+                            position, Toast.LENGTH_SHORT).show();
+
+            }
+        });
     }
     @Override
     public void onClick(View v){
@@ -41,11 +67,14 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             //If new Note, call createNewNote()
             case R.id.btnNewNote:
                 this.goToDoListActivity();
-                createNewNote();
+                //this.createNewNote();
                 break;
             //If delete note, call deleteNewestNote()
             case R.id.btnDeleteNote:
                 deleteNewestNote();
+                break;
+            case R.id.btnSave:
+
                 break;
             //This shouldn't happen
             default:
@@ -54,8 +83,37 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
     void goToDoListActivity(){
         Intent toDoListIntent = new Intent(this, ToDoListActivity.class);
-        startActivity(toDoListIntent);
+        startActivityForResult(toDoListIntent,  1);
     }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1) {
+            if(resultCode == RESULT_OK) {
+                hmTitle = data.getStringExtra("titleText");
+                hmContent  = data.getStringExtra("contentText");
+                hmDate = data.getStringExtra("dateText");
+                hmTime = data.getStringExtra("timeText");
+
+
+                //Add the resutls to the 2D Array
+                addToArrayList(hmTitle, hmContent, hmDate,  hmTime);
+            }
+        }
+    }
+
+    void addToArrayList(String title, String notes, String date, String time){
+        Log.i(TAG, "Debug:1) Title +notes before array!->" + title + ",    " +  notes +
+                ",  " + date + ",  " + time);
+        arrayNotes.add(title);
+        Log.i(TAG, "Debug: 2)  after array!->" + title + ",    " +  notes +
+                ",  " + date + ",  " + time);
+        adapter.notifyDataSetChanged();
+        Log.i(TAG, "Debug: 3) after notify change!->" + title +  ",    " +  notes +
+                ",  " + date + ",  " + time);
+
+    }
+
 
     //Create a new note with the title "New Note" and content "Note Content"
     void createNewNote(){
@@ -78,23 +136,30 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     //Create a new note with the that passes a tittle and content as parameters
-    void createNewNote(String title, String content){
+    void createNewNote(String title, String content, String date, String time){
         //Create a ContentValues object
         ContentValues myCV = new ContentValues();
         //Put key_value pairs based on the column names, and the values
         myCV.put(ToDoProvider.TODO_TABLE_COL_TITLE, title);
         myCV.put(ToDoProvider.TODO_TABLE_COL_CONTENT, content);
+        myCV.put(ToDoProvider.TODO_TABLE_COL_DATE, date);
+        myCV.put(ToDoProvider.TODO_TABLE_COL_TIME, time);
         //Perform the insert function using the ContentProvider
         getContentResolver().insert(ToDoProvider.CONTENT_URI,myCV);
         //Set the projection for the columns to be returned
         String[] projection = {
                 ToDoProvider.TODO_TABLE_COL_ID,
                 ToDoProvider.TODO_TABLE_COL_TITLE,
-                ToDoProvider.TODO_TABLE_COL_CONTENT};
+                ToDoProvider.TODO_TABLE_COL_CONTENT,
+                ToDoProvider.TODO_TABLE_COL_DATE,
+                ToDoProvider.TODO_TABLE_COL_TIME};
         //Perform a query to get all rows in the DB
         Cursor myCursor = getContentResolver().query(ToDoProvider.CONTENT_URI,projection,null,null,null);
         //Create a toast message which states the number of rows currently in the database
         Toast.makeText(getApplicationContext(),"content added! " + Integer.toString(myCursor.getCount()),Toast.LENGTH_LONG).show();
+
+        //keeps track of array
+       // this.addToArrayList(title, content, date , time);
     }
 
     //Delete the newest note placed into the database
@@ -103,7 +168,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         String[] projection = {
                 ToDoProvider.TODO_TABLE_COL_ID,
                 ToDoProvider.TODO_TABLE_COL_TITLE,
-                ToDoProvider.TODO_TABLE_COL_CONTENT};
+                ToDoProvider.TODO_TABLE_COL_CONTENT,
+                ToDoProvider.TODO_TABLE_COL_DATE,
+                ToDoProvider.TODO_TABLE_COL_TIME};
 
         //Perform the query, with ID Descending
         Cursor myCursor = getContentResolver().query(ToDoProvider.CONTENT_URI,projection,null,null,"_ID DESC");

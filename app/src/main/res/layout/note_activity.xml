@@ -24,46 +24,34 @@
         android:inputType="text"
         />
 
-    <EditText
-        android:id="@+id/etNoteContent"
-        android:layout_width="403dp"
-        android:layout_height="500dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginBottom="8dp"
-        android:ems="10"
-        android:gravity="top"
-        android:inputType="textMultiLine"
-        android:hint="@string/lorem"
-        android:text=""
-        app:layout_constraintBottom_toTopOf="@+id/etDatePicker"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvNoteTitle" />
 
     <EditText
-        android:id="@+id/etDatePicker"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
+        android:id="@+id/etNoteContent"
+        android:layout_width="380dp"
+        android:layout_height="450dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginRight="16dp"
         android:ems="10"
-        android:inputType="date"
-        android:text="10/06/17 11:59"
-        app:layout_constraintHorizontal_bias="0.243"
+        android:gravity="top"
+        android:hint="@string/lorem"
+        android:inputType="textMultiLine"
+        android:text=""
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toLeftOf="@+id/btnSave"
-        app:layout_constraintTop_toBottomOf="@+id/etNoteContent" />
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvNoteTitle" />
 
     <Button
         android:id="@+id/btnSave"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:layout_marginRight="16dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginRight="136dp"
         android:text="Save"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/etNoteContent" />
+        app:layout_constraintTop_toBottomOf="@+id/in_time" />
 
     <EditText
         android:id="@+id/in_date"
@@ -75,7 +63,7 @@
         android:layout_marginStart="32dp"
         android:layout_marginTop="8dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/etDatePicker" />
+        app:layout_constraintTop_toBottomOf="@+id/etNoteContent" />
 
     <Button
         android:id="@+id/btn_date"
@@ -88,7 +76,7 @@
         android:layout_toRightOf="@+id/in_date"
         android:text="SELECT DATE"
         app:layout_constraintStart_toEndOf="@+id/in_date"
-        app:layout_constraintTop_toBottomOf="@+id/etDatePicker" />
+        app:layout_constraintTop_toBottomOf="@+id/etNoteContent" />
 
     <EditText
         android:id="@+id/in_time"
