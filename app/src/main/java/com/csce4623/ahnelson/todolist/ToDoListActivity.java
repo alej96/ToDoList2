@@ -137,6 +137,8 @@ public class ToDoListActivity extends AppCompatActivity implements View.OnClickL
                                                   int minute) {
 
                                 txtTime.setText(hourOfDay + ":" + minute);
+                                mHour = hourOfDay;
+                                mMinute = minute;
                             }
                         }, mHour, mMinute, true);
                 timePickerDialog.show();
@@ -192,19 +194,20 @@ public class ToDoListActivity extends AppCompatActivity implements View.OnClickL
         cal_alarm.set(Calendar.SECOND,0);
 
 
-        if(cal_alarm.before(cal_now)){
-            cal_alarm.add(Calendar.DATE,1);
-        }
+//        if(cal_alarm.before(cal_now)){
+//            cal_alarm.add(Calendar.DATE,1);
+//        }
 
         //Display  notification!
         alarmIntent = new Intent(ToDoListActivity.this, Alarm_Receiver.class);
         alarmIntent.putExtra("notificationMsg",titleNote);
         pendingIntent = PendingIntent.getBroadcast(ToDoListActivity.this, 0, alarmIntent, 0);
-        Log.i("ToDoActivity", "Alarm Created");
+        Log.i("ToDoActivity", "Alarm Created at "  + cal_alarm.getTimeInMillis() );
+        Log.i("ToDoActivity","Current Time: " + System.currentTimeMillis());
         //Fire alarm at the time specified
         //cal_alarm should be the calendar variable
-        manager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime()+6000, pendingIntent);
-       // manager.setExact(AlarmManager.RTC_WAKEUP,cal_alarm.getTimeInMillis(), pendingIntent);
+       // manager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime()+6000, pendingIntent);
+        manager.set(AlarmManager.RTC_WAKEUP,cal_alarm.getTimeInMillis(), pendingIntent);
     }
 
     //Get the Information of the note (title, content, date)

@@ -3,10 +3,12 @@ package com.csce4623.ahnelson.todolist;
 import android.annotation.TargetApi;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
+import android.content.Intent;
 
 
 public class NotificationHelper extends ContextWrapper {
@@ -47,10 +49,16 @@ public class NotificationHelper extends ContextWrapper {
     }
 
     public NotificationCompat.Builder getChannelNotification(String Notetitle) {
+
+        Intent resultIntent = new Intent(this, HomeActivity.class);
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 1, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+
         return new NotificationCompat.Builder(getApplicationContext(), channelID)
                 .setContentTitle("Reminder!")
                 .setContentText(Notetitle)
                 .setSmallIcon(R.drawable.ic_android)
-                .setAutoCancel(true);
+                .setAutoCancel(true)
+                .setContentIntent(resultPendingIntent);
     }
 }

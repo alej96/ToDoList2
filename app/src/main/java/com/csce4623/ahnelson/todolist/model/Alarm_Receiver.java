@@ -13,19 +13,19 @@ public class Alarm_Receiver extends BroadcastReceiver {
     String notificationMsg ;
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.i("AlarmReceiver", "Alarm Recieved!");
+        Log.i("ToDoActivity", "Alarm Recieved!");
         try{
 
             notificationMsg = intent.getStringExtra("notificationMsg");
-            Log.i("AlarmReceiver",intent.getStringExtra("notificationMsg"));
+            Log.i("ToDoActivity",intent.getStringExtra("notificationMsg"));
         }catch (Error e){
-            Log.e("AlarmReceiver",e.toString());
+            Log.e("ToDoActivity",e.toString());
         }
 
         //get the title from intent
 
 
-        
+
         NotificationHelper notificationHelper = new NotificationHelper(context);
         NotificationCompat.Builder nb = notificationHelper.getChannelNotification(notificationMsg);
         notificationHelper.getManager().notify(1, nb.build());
