@@ -34,6 +34,14 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     DatabaseHelper mDatabaseHelper;
 
+    //Column names for the ToDoList Table
+    public static final String TABLE_COL_ID = "ID";
+    public static final String TABLE_COL_TITLE = "TITLE";
+    public static final String TABLE_COL_CONTENT = "CONTENT";
+    public static final String TABLE_COL_DATE = "DATE";
+    public static final String TABLE_COL_TIME = "TIME";
+    public static final Boolean TABLE_COL_DONE =  false;
+
     public HomeActivity(){
 
     }
@@ -52,6 +60,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         //findViewById(R.id.btnDeleteNote).setOnClickListener(this);
 
          listNotes = (ListView) findViewById(R.id.all_toDo_lists);
+
         // arrayNotes = new ArrayList<String>();
 
 
@@ -90,9 +99,11 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             //get the value from the database in column 1
             //then add it to the ArrayList
             String tempData = data.getString(1);
+            String tempIdnbr = data.getString(0);
 
             if(tempData != null)
             {
+                //arrayNotes.add(tempIdnbr + ": " + tempData);
                 arrayNotes.add(tempData);
             }
 
@@ -102,6 +113,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         //create the list adapter and set the adapter
         adapter = new ArrayAdapter<String>(HomeActivity.this, android.R.layout.simple_gallery_item, arrayNotes);
+        //populate list view
         listNotes.setAdapter(adapter);
 
         long numRows = listNotes.getCount();
@@ -130,12 +142,16 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                         while (data.moveToNext()) {
                             itemID = data.getInt(0);
                         }
-
+                      //  Cursor singleRow = mDatabaseHelper.getDataPoint(itemID);
+                       // hmContent = singleRow.getString(singleRow.getColumnIndex(TABLE_COL_CONTENT)); //content column
+                            hmContent = mDatabaseHelper.getDataPoint(itemID, TABLE_COL_CONTENT);
                         if (itemID > -1) {
                             Log.d(TAG, "onItemClick: The ID is: " + itemID);
                             Intent editScreenIntent = new Intent(HomeActivity.this, EditDataActivity.class);
-                            editScreenIntent.putExtra("listId", itemID);
+                            editScreenIntent.putExtra("listId", listID);
+                            editScreenIntent.putExtra("positionArray", position );
                             editScreenIntent.putExtra("titleText", name);
+                            editScreenIntent.putExtra("contentText", hmContent);
                             startActivityForResult(editScreenIntent, 2);
                            // goEditDataActivity();
                         } else {
@@ -179,6 +195,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     void goToDoListActivity(){
         Intent toDoListIntent = new Intent(this, ToDoListActivity.class);
         toDoListIntent.putExtra("listId", listID);
+        toDoListIntent.putExtra("positionArray", listID);
         startActivityForResult(toDoListIntent,  1);
     }
 
@@ -202,25 +219,25 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 //                hmDate = data.getStringExtra("dateText");
 //                hmTime = data.getStringExtra("timeText");
 
-              //  listID = Integer.parseInt( data.getStringExtra("listID"));
+                listID =  data.getIntExtra("listID", -1);
 
                 //Add the resutls to the 2D Array
 //                addToArrayList(hmTitle, hmContent, hmDate,  hmTime);
             }
         }
 
-//        else if (requestCode == 2) {
-//            if(resultCode == RESULT_OK) {
-//                hmTitle = data.getStringExtra("titleText");
-////                hmContent  = data.getStringExtra("contentText");
-////                hmDate = data.getStringExtra("dateText");
-////                hmTime = data.getStringExtra("timeText");
-//
-//                listID = Integer.parseInt( data.getStringExtra("listID"));
-//                //Add the resutls to the 2D Array
-////                addToArrayList(hmTitle, hmContent, hmDate,  hmTime);
-//            }
-//        }
+        else if (requestCode == 2) {
+            if(resultCode == RESULT_OK) {
+                hmTitle = data.getStringExtra("titleText");
+//                hmContent  = data.getStringExtra("contentText");
+//                hmDate = data.getStringExtra("dateText");
+//                hmTime = data.getStringExtra("timeText");
+
+                listID = data.getIntExtra("listID", -1);
+                //Add the resutls to the 2D Array
+//                addToArrayList(hmTitle, hmContent, hmDate,  hmTime);
+            }
+        }
     }
 
 

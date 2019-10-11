@@ -21,7 +21,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // Authority is the package name
     private static final String AUTHORITY = "com.csce4623.ahnelson.todolist.todoprovider";
     //TABLE_NAME is defined as ToDoList
-    private static final String TABLE_NAME = "ToDoList";
+    private static final String TABLE_NAME = "ToDoList2";
     //Create a CONTENT_URI for use by other classes
     public static final Uri CONTENT_URI =
             Uri.parse("content://" + AUTHORITY + "/"+TABLE_NAME);
@@ -44,8 +44,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
 
         String createTable = "CREATE TABLE " + TABLE_NAME + " (ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                TABLE_COL_TITLE + " TEXT)";    //," +
-               // TABLE_COL_CONTENT + " TEXT)" ;
+                TABLE_COL_TITLE + " TEXT NOT NULL, " +
+                TABLE_COL_CONTENT + " TEXT NOT NULL);" ;
     Log.i(TAG, "Table Created: " + createTable);
         db.execSQL(createTable);
 
@@ -81,6 +81,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    public void insertData(String title, String content){
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query = "INSERT INTO " + TABLE_NAME + " ( " +
+               TABLE_COL_TITLE + " , " + TABLE_COL_CONTENT + " ) VALUES ( '" +
+               title + "' , '" + content +"' );";
+        Log.d(TAG, "updateName: query: " + query);
+        db.execSQL(query);
+    }
+
     public Cursor getData(){
         SQLiteDatabase db = this.getWritableDatabase();
         String query = "SELECT * FROM " + TABLE_NAME;
@@ -102,11 +112,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     /**
      * Updates the name field
      */
-    public void updateData(String newName, int id, String oldName){
+    public void updateData(String newName, int id, String oldName, String colName){
         SQLiteDatabase db = this.getWritableDatabase();
-        String query = "UPDATE " + TABLE_NAME + " SET " + TABLE_COL_TITLE +
+        String query = "UPDATE " + TABLE_NAME + " SET " + colName +
                 " = '" + newName + "' WHERE " + TABLE_COL_ID + " = '" + id + "'" +
-                " AND " + TABLE_COL_TITLE + " = '" + oldName + "'";
+                " AND " + colName + " = '" + oldName + "'";
         Log.d(TAG, "updateName: query: " + query);
         Log.d(TAG, "updateName: Setting name to " + newName);
         db.execSQL(query);
@@ -125,6 +135,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Log.d(TAG, "deleteName: Deleting " + title + " from database.");
         db.execSQL(query);
     }
+
+    public Cursor getDataPoint(int itemID) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query = "SELECT * FROM " + TABLE_NAME +
+                " WHERE " + TABLE_COL_ID + " = '" + itemID + "'";
+
+        Cursor data = db.rawQuery(query, null);
+        return data;
+    }
+    public String getDataPoint(int itemID, String colName) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query = "SELECT " + colName  +" FROM " + TABLE_NAME +
+                " WHERE " + TABLE_COL_ID + " = '" + itemID + "';";
+
+        Cursor data = db.rawQuery(query, null);
+        data.moveToFirst();
+        String output =  data.getString(data.getColumnIndex(TABLE_COL_CONTENT));
+        return output;
+    }
+
 
     /**
      * Last Row from database

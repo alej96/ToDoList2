@@ -18,8 +18,8 @@ public class Alarm_Receiver extends BroadcastReceiver {
         try{
             //get the title from intent
             notificationMsg = intent.getStringExtra("titleText");
-            listID = Integer.parseInt(intent.getStringExtra("listID"));
-            Log.i("ToDoActivity",intent.getStringExtra("titleText"));
+            listID = Integer.parseInt(intent.getStringExtra("positionArray"));
+            Log.i("ToDoActivity", notificationMsg + " ,  " + listID);
         }catch (Error e){
             Log.e("ToDoActivity",e.toString());
         }

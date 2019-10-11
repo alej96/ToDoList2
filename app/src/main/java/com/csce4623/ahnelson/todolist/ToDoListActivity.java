@@ -33,12 +33,20 @@ public class ToDoListActivity extends AppCompatActivity implements View.OnClickL
     Intent alarmIntent;
 
     String contentNote , titleNote;
-    int listID;
+    int listID, positionArray;
 
   //  Button btnDatePicker, btnTimePicker;
     EditText txtDate, txtTime;
     String stringDate, stringTime;
     private int mYear, mMonth, mDay, mHour, mMinute;
+
+    //Column names for the ToDoList Table
+    public static final String TABLE_COL_ID = "ID";
+    public static final String TABLE_COL_TITLE = "TITLE";
+    public static final String TABLE_COL_CONTENT = "CONTENT";
+    public static final String TABLE_COL_DATE = "DATE";
+    public static final String TABLE_COL_TIME = "TIME";
+    public static final Boolean TABLE_COL_DONE =  false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +72,7 @@ public class ToDoListActivity extends AppCompatActivity implements View.OnClickL
         mDatabaseHelper = new DatabaseHelper(this);
         Intent intent = getIntent();
         listID = intent.getIntExtra("listId", 0);
+        positionArray = intent.getIntExtra("positionArray", 0);
         //initialize alarm manager
       //  this.context = this;
 
@@ -99,6 +108,7 @@ public class ToDoListActivity extends AppCompatActivity implements View.OnClickL
 
 
                 intent.putExtra("listID", listID);
+                intent.putExtra("positionArray", positionArray);
 
                 setResult(RESULT_OK, intent);
 
@@ -162,8 +172,10 @@ public class ToDoListActivity extends AppCompatActivity implements View.OnClickL
 
     private void createNewToDo() {
 
-        AddData(titleNote, "TITLE");
+       // AddData(titleNote, TABLE_COL_TITLE);
+        //AddData(contentNote, TABLE_COL_CONTENT);
       //  homeActivity.AddData(contentNote, "CONTENT");
+        mDatabaseHelper.insertData(titleNote, contentNote);
     }
 
     public void AddData(String newEntry , String colName){
@@ -174,6 +186,10 @@ public class ToDoListActivity extends AppCompatActivity implements View.OnClickL
         }else{
             toastMessage("Something went wrong, please debug");
         }
+    }
+
+    public void insertData(String title, String content){
+        mDatabaseHelper.insertData(title, content);
     }
 
     public void saveNewNote(){
@@ -231,12 +247,14 @@ public class ToDoListActivity extends AppCompatActivity implements View.OnClickL
         //Display  notification!
         alarmIntent = new Intent(ToDoListActivity.this, Alarm_Receiver.class);
         alarmIntent.putExtra("notificationMsg",titleNote);
-        pendingIntent = PendingIntent.getBroadcast(ToDoListActivity.this, listID, alarmIntent, 0);
+        alarmIntent.putExtra("positionArray",positionArray);
+
+        pendingIntent = PendingIntent.getBroadcast(ToDoListActivity.this, positionArray, alarmIntent, 0);
         Log.i("ToDoActivity", "Alarm Created at "  + cal_alarm.getTimeInMillis() );
         Log.i("ToDoActivity","Current Time: " + System.currentTimeMillis());
         //Fire alarm at the time specified
         //cal_alarm should be the calendar variable
-        manager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime()+6000, pendingIntent);
+       manager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime()+6000, pendingIntent);
        // manager.set(AlarmManager.RTC_WAKEUP,cal_alarm.getTimeInMillis(), pendingIntent);
     }
 

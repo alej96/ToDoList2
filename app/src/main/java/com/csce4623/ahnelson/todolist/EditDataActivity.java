@@ -34,8 +34,8 @@ public class EditDataActivity extends AppCompatActivity implements View.OnClickL
     Intent alarmIntent;
 
     String contentNote , titleNote, alarmTimeNote;
-    String  oldTitle;
-    int listID;
+    String  oldTitle, oldContent;
+    int listID , positionArray;
 
     //  Button btnDatePicker, btnTimePicker;
     EditText txtDate, txtTime;
@@ -43,7 +43,16 @@ public class EditDataActivity extends AppCompatActivity implements View.OnClickL
     DatabaseHelper mDatabaseHelper;
     String stringDate, stringTime;
     String[] columns = new String[] {"ID" , "TITLE", "CONTENT", "DATE", "TIME" };
+    String[] columnsNoID = new String[] { "TITLE", "CONTENT"};
     private int mYear, mMonth, mDay, mHour, mMinute;
+
+    //Column names for the ToDoList Table
+    public static final String TABLE_COL_ID = "ID";
+    public static final String TABLE_COL_TITLE = "TITLE";
+    public static final String TABLE_COL_CONTENT = "CONTENT";
+    public static final String TABLE_COL_DATE = "DATE";
+    public static final String TABLE_COL_TIME = "TIME";
+    public static final Boolean TABLE_COL_DONE =  false;
 
 
     @Override
@@ -80,10 +89,13 @@ public class EditDataActivity extends AppCompatActivity implements View.OnClickL
         //Get the intent extra from HomeActivity
         Intent receivedIntent = getIntent();
         //now get the itemID we passed as an extra
-        listID = receivedIntent.getIntExtra("listId", -1);
+        listID = receivedIntent.getIntExtra("listId", 0);
+        positionArray = receivedIntent.getIntExtra("positionArray", 0);
         oldTitle = receivedIntent.getStringExtra("titleText");
+        oldContent = receivedIntent.getStringExtra("contentText");
 
         txtTitle.setText(oldTitle);
+        txtContent.setText(oldContent);
 
 
     }
@@ -94,9 +106,11 @@ public class EditDataActivity extends AppCompatActivity implements View.OnClickL
             //If save clicked, go back to main activity and add the reminder
             case R.id.btnSaveEdit:
 
-                titleNote = txtTitle.getText().toString();
                 //update database
-                mDatabaseHelper.updateData(titleNote, listID, oldTitle);
+                titleNote = txtTitle.getText().toString();
+                mDatabaseHelper.updateData(titleNote, listID, oldTitle, TABLE_COL_TITLE);
+                contentNote = txtContent.getText().toString();
+                mDatabaseHelper.updateData(contentNote, listID, oldContent, TABLE_COL_CONTENT);
 
                 saveEditedNote();
 
@@ -228,7 +242,8 @@ public class EditDataActivity extends AppCompatActivity implements View.OnClickL
         //Display  notification!
         alarmIntent = new Intent(EditDataActivity.this, Alarm_Receiver.class);
         alarmIntent.putExtra("notificationMsg",titleNote);
-        pendingIntent = PendingIntent.getBroadcast(EditDataActivity.this, listID, alarmIntent, 0);
+        alarmIntent.putExtra("positionArray",positionArray);
+        pendingIntent = PendingIntent.getBroadcast(EditDataActivity.this, positionArray, alarmIntent, 0);
         Log.i("ToDoActivity", "Edit: Alarm Created at "  + cal_alarm.getTimeInMillis() );
         Log.i("ToDoActivity","Edit: Current Time: " + System.currentTimeMillis());
         //Fire alarm at the time specified
