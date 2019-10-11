@@ -125,4 +125,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Log.d(TAG, "deleteName: Deleting " + title + " from database.");
         db.execSQL(query);
     }
+
+    /**
+     * Last Row from database
+     */
+
+//    public int lastRow( ){
+//
+//        SQLiteDatabase db = this.getWritableDatabase();
+//        String query = "SELECT COUNT(*) FROM "+ TABLE_NAME + ";";
+//
+//
+//    }
 }

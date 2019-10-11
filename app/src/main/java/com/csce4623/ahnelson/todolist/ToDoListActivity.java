@@ -62,7 +62,8 @@ public class ToDoListActivity extends AppCompatActivity implements View.OnClickL
         txtDate = getDateEditText();
         txtTime = getTimeEditText();
         mDatabaseHelper = new DatabaseHelper(this);
-
+        Intent intent = getIntent();
+        listID = intent.getIntExtra("listId", 0);
         //initialize alarm manager
       //  this.context = this;
 
@@ -96,7 +97,7 @@ public class ToDoListActivity extends AppCompatActivity implements View.OnClickL
                 intent.putExtra("dateText", stringDate);
                 intent.putExtra("timeText", stringTime);
 
-             //   listID++;
+
                 intent.putExtra("listID", listID);
 
                 setResult(RESULT_OK, intent);
@@ -230,7 +231,7 @@ public class ToDoListActivity extends AppCompatActivity implements View.OnClickL
         //Display  notification!
         alarmIntent = new Intent(ToDoListActivity.this, Alarm_Receiver.class);
         alarmIntent.putExtra("notificationMsg",titleNote);
-        pendingIntent = PendingIntent.getBroadcast(ToDoListActivity.this, 1, alarmIntent, 0);
+        pendingIntent = PendingIntent.getBroadcast(ToDoListActivity.this, listID, alarmIntent, 0);
         Log.i("ToDoActivity", "Alarm Created at "  + cal_alarm.getTimeInMillis() );
         Log.i("ToDoActivity","Current Time: " + System.currentTimeMillis());
         //Fire alarm at the time specified

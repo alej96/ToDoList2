@@ -49,7 +49,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     //Set the OnClick Listener for buttons
     void initializeComponents(){
         findViewById(R.id.btnNewNote).setOnClickListener(this);
-        findViewById(R.id.btnDeleteNote).setOnClickListener(this);
+        //findViewById(R.id.btnDeleteNote).setOnClickListener(this);
 
          listNotes = (ListView) findViewById(R.id.all_toDo_lists);
         // arrayNotes = new ArrayList<String>();
@@ -97,6 +97,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             }
 
         }
+        listID = data.getCount();
 
 
         //create the list adapter and set the adapter
@@ -161,9 +162,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
              //  this.createNewNote(hmTitle, hmContent, hmDate, hmTime);
                 break;
             //If delete note, call deleteNewestNote()
-            case R.id.btnDeleteNote:
-                deleteNewestNote();
-                break;
+//            case R.id.btnDeleteNote:
+//                deleteNewestNote();
+//                break;
             case R.id.btnSave:
 
                 break;
@@ -177,6 +178,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
     void goToDoListActivity(){
         Intent toDoListIntent = new Intent(this, ToDoListActivity.class);
+        toDoListIntent.putExtra("listId", listID);
         startActivityForResult(toDoListIntent,  1);
     }
 
