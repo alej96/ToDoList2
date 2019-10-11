@@ -11,23 +11,22 @@ import com.csce4623.ahnelson.todolist.NotificationHelper;
 public class Alarm_Receiver extends BroadcastReceiver {
 
     String notificationMsg ;
+    int listID;
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.i("ToDoActivity", "Alarm Recieved!");
         try{
-
-            notificationMsg = intent.getStringExtra("notificationMsg");
-            Log.i("ToDoActivity",intent.getStringExtra("notificationMsg"));
+            //get the title from intent
+            notificationMsg = intent.getStringExtra("titleText");
+            listID = Integer.parseInt(intent.getStringExtra("listID"));
+            Log.i("ToDoActivity",intent.getStringExtra("titleText"));
         }catch (Error e){
             Log.e("ToDoActivity",e.toString());
         }
 
-        //get the title from intent
-
-
 
         NotificationHelper notificationHelper = new NotificationHelper(context);
-        NotificationCompat.Builder nb = notificationHelper.getChannelNotification(notificationMsg);
+        NotificationCompat.Builder nb = notificationHelper.getChannelNotification(notificationMsg, listID);
         notificationHelper.getManager().notify(1, nb.build());
     }
 

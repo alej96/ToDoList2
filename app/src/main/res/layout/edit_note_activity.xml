@@ -7,59 +7,67 @@
     tools:context="com.csce4623.ahnelson.todolist.ToDoListActivity">
 
     <Button
-        android:id="@+id/btnSave"
+        android:id="@+id/btnSaveEdit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginRight="190dp"
+        android:layout_marginRight="100dp"
         android:layout_marginBottom="16dp"
         android:text="Save"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
 
-
+    <Button
+        android:id="@+id/btnDeleteEdit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="230dp"
+        android:layout_marginBottom="16dp"
+        android:text="Done?"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
 
 
     <Button
-        android:id="@+id/btn_date"
+        android:id="@+id/btn_dateEdit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/in_date"
+        android:layout_alignBottom="@+id/in_dateEdit"
         android:layout_marginStart="40dp"
         android:layout_marginBottom="16dp"
-        android:layout_toEndOf="@+id/in_date"
-        android:layout_toRightOf="@+id/in_date"
+        android:layout_toEndOf="@+id/in_dateEdit"
+        android:layout_toRightOf="@+id/in_dateEdit"
         android:text="SELECT DATE"
-        app:layout_constraintBottom_toTopOf="@+id/btn_time"
-        app:layout_constraintStart_toEndOf="@+id/in_date" />
+        app:layout_constraintBottom_toTopOf="@+id/btn_timeEdit"
+        app:layout_constraintStart_toEndOf="@+id/in_dateEdit" />
 
     <Button
-        android:id="@+id/btn_time"
+        android:id="@+id/btn_timeEdit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/btn_date"
-        android:layout_alignStart="@+id/btn_date"
-        android:layout_alignLeft="@+id/btn_date"
+        android:layout_below="@+id/btn_dateEdit"
+        android:layout_alignStart="@+id/btn_dateEdit"
+        android:layout_alignLeft="@+id/btn_dateEdit"
         android:layout_marginStart="32dp"
         android:layout_marginBottom="24dp"
         android:text="SELECT TIME"
-        app:layout_constraintBottom_toTopOf="@+id/btnSave"
-        app:layout_constraintStart_toEndOf="@+id/in_time" />
+        app:layout_constraintBottom_toTopOf="@+id/btnSaveEdit"
+        app:layout_constraintStart_toEndOf="@+id/in_timeEdit" />
 
     <EditText
-        android:id="@+id/in_date"
+        android:id="@+id/in_dateEdit"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
+        android:text="10/10/2019"
         android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_marginStart="32dp"
         android:layout_marginBottom="24dp"
-        android:text = "10/10/2019"
-        app:layout_constraintBottom_toTopOf="@+id/in_time"
+        app:layout_constraintBottom_toTopOf="@+id/in_timeEdit"
         app:layout_constraintStart_toStartOf="parent" />
 
     <EditText
-        android:id="@+id/etNoteContent"
+        android:id="@+id/etNoteContentEdit"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="16dp"
@@ -69,41 +77,42 @@
         android:ems="10"
         android:gravity="top"
         android:hint="@string/lorem"
+
         android:inputType="textMultiLine"
-        android:text="Start Typing your note"
-        app:layout_constraintBottom_toTopOf="@+id/in_date"
+        android:text="@string/lorem"
+        app:layout_constraintBottom_toTopOf="@+id/in_dateEdit"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.4"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvNoteTitle"
+        app:layout_constraintTop_toBottomOf="@+id/tvNoteTitleEdit"
         app:layout_constraintVertical_bias="0.0" />
 
     <EditText
-        android:id="@+id/in_time"
+        android:id="@+id/in_timeEdit"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/in_date"
+        android:layout_below="@+id/in_dateEdit"
         android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
         android:layout_marginStart="40dp"
         android:layout_marginBottom="24dp"
         android:text="10:00"
-        app:layout_constraintBottom_toTopOf="@+id/btnSave"
+        app:layout_constraintBottom_toTopOf="@+id/btnSaveEdit"
         app:layout_constraintStart_toStartOf="parent" />
 
     <EditText
-        android:id="@+id/tvNoteTitle"
+        android:id="@+id/tvNoteTitleEdit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginRight="8dp"
-        android:hint="Note_Title"
+        android:hint="Note_TitleEdit"
         android:inputType="text"
         android:maxLength="25"
         android:maxLines="1"
-        android:text="Note Title"
+        android:text="Note_TitleEdit"
         android:textSize="24sp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"

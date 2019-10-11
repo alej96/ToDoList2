@@ -48,10 +48,10 @@ public class NotificationHelper extends ContextWrapper {
                 .setSmallIcon(R.drawable.ic_android);
     }
 
-    public NotificationCompat.Builder getChannelNotification(String Notetitle) {
+    public NotificationCompat.Builder getChannelNotification(String Notetitle, int codeID) {
 
         Intent resultIntent = new Intent(this, HomeActivity.class);
-        PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 1, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(this, codeID, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
 
         return new NotificationCompat.Builder(getApplicationContext(), channelID)

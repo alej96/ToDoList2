@@ -1,70 +1,86 @@
 package com.csce4623.ahnelson.todolist;
 
 import android.app.AlarmManager;
+import android.app.DatePickerDialog;
 import android.app.PendingIntent;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.Toast;
 import android.util.Log;
+import android.view.View;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.TimePicker;
-import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
+import android.widget.Toast;
 
 import com.csce4623.ahnelson.todolist.model.Alarm_Receiver;
 
 import java.util.Calendar;
 import java.util.Date;
 
-public class ToDoListActivity extends AppCompatActivity implements View.OnClickListener{
+public class EditDataActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private static String TAG = ToDoListActivity.class.getName();
+
+
+    private static String TAG = EditDataActivity.class.getName();
     HomeActivity homeActivity = new HomeActivity();
-    DatabaseHelper mDatabaseHelper;
     Alarm_Receiver alarmReceiver = new Alarm_Receiver();
     Context context;
     PendingIntent pendingIntent;
     Intent alarmIntent;
 
-    String contentNote , titleNote;
+    String contentNote , titleNote, alarmTimeNote;
     int listID;
 
-  //  Button btnDatePicker, btnTimePicker;
+    //  Button btnDatePicker, btnTimePicker;
     EditText txtDate, txtTime;
+    EditText txtTitle, txtContent;
+    DatabaseHelper mDatabaseHelper;
     String stringDate, stringTime;
     private int mYear, mMonth, mDay, mHour, mMinute;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.note_activity);
+        setContentView(R.layout.edit_note_activity);
         initializeComponents();
 
         //change title of screen
-        setTitle("Create a New Task");
+        setTitle("Edit Current Task");
     }
 
 
     void initializeComponents(){
 
-        findViewById(R.id.btnSave).setOnClickListener(this);
-        findViewById(R.id.btn_date).setOnClickListener(this);
-        findViewById(R.id.btn_time).setOnClickListener(this);
+        findViewById(R.id.btnSaveEdit).setOnClickListener(this);
+        findViewById(R.id.btn_dateEdit).setOnClickListener(this);
+        findViewById(R.id.btn_timeEdit).setOnClickListener(this);
+
+        txtTitle = (EditText) findViewById(R.id.tvNoteTitleEdit);
+        txtContent = (EditText) findViewById(R.id.etNoteContentEdit);
+
+        mDatabaseHelper = new DatabaseHelper(this);
 
 //        txtDate=(EditText)findViewById(R.id.in_date);
 //        txtTime=(EditText)findViewById(R.id.in_time);
         txtDate = getDateEditText();
         txtTime = getTimeEditText();
-        mDatabaseHelper = new DatabaseHelper(this);
 
         //initialize alarm manager
-      //  this.context = this;
+        //  this.context = this;
+
+        //Get the intent extra from HomeActivity
+        Intent receivedIntent = getIntent();
+        //now get the itemID we passed as an extra
+        listID = receivedIntent.getIntExtra("listId", -1);
+        titleNote = receivedIntent.getStringExtra("titleText");
+
+        txtTitle.setText(titleNote);
+
 
     }
 
@@ -72,27 +88,30 @@ public class ToDoListActivity extends AppCompatActivity implements View.OnClickL
     public void onClick(View v){
         switch (v.getId()){
             //If save clicked, go back to main activity and add the reminder
-            case R.id.btnSave:
+            case R.id.btnSaveEdit:
 
-            //Read and Save Note
-              saveNewNote();
+                String oldTitle = txtTitle.getText().toString();
 
-               //Start notification
-               this.start(mYear, mMonth, mDay, mHour, mMinute);
+
+                //update database
+                mDatabaseHelper.updateData(titleNote, listID, oldTitle);
+               // this.createNewToDo();
+                saveNewNote();
+                this.start(mYear, mMonth, mDay, mHour, mMinute);
 
 //               //create a pending intent that delays the intent
-//                //unitl the specified calendar time
-//                pendingIntent = PendingIntent.getBroadcast(ToDoListActivity.this, 0,
+                //unitl the specified calendar time
+//                pendingIntent = PendingIntent.getBroadcast(EditDataActivity.this, 0,
 //                        alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-                //set alarm manager
+//
+//                //set alarm manager
 //                alarmManager.set(AlarmManager.RTC_WAKEUP, calendarTime.getTimeMillis(),
 //                        pendingIntent);
 
                 //Send data to HomeActivity
                 Intent intent = new Intent();
                 intent.putExtra("titleText", titleNote);
-               intent.putExtra("contentText", contentNote);
+                intent.putExtra("contentText", contentNote);
                 intent.putExtra("dateText", stringDate);
                 intent.putExtra("timeText", stringTime);
 
@@ -100,12 +119,21 @@ public class ToDoListActivity extends AppCompatActivity implements View.OnClickL
                 intent.putExtra("listID", listID);
 
                 setResult(RESULT_OK, intent);
+                finish();
+                break;
 
-                this.createNewToDo();
+            case R.id.btnDeleteEdit:
+
+                mDatabaseHelper.deleteName(listID, titleNote);
+
+                txtTitle.setText("");
+                toastMessage("Data removed from Database");
+
+              //  setResult(RESULT_OK);
                 finish();
                 break;
             //This shouldn't happen
-            case R.id.btn_date:
+            case R.id.btn_dateEdit:
                 //pop up data came from: https://www.journaldev.com/9976/android-date-time-picker-dialog
                 // Get Current Date
                 final Calendar c = Calendar.getInstance();
@@ -128,7 +156,7 @@ public class ToDoListActivity extends AppCompatActivity implements View.OnClickL
                 datePickerDialog.show();
 
                 break;
-            case R.id.btn_time:
+            case R.id.btn_timeEdit:
                 // Get Current Time
                 final Calendar ctime = Calendar.getInstance();
                 mHour = ctime.get(Calendar.HOUR_OF_DAY);
@@ -154,26 +182,18 @@ public class ToDoListActivity extends AppCompatActivity implements View.OnClickL
                             }
                         }, mHour, mMinute, true);
                 timePickerDialog.show();
+                break;
             default:
                 break;
+
         }
     }
 
-    private void createNewToDo() {
-
-        AddData(titleNote, "TITLE");
-      //  homeActivity.AddData(contentNote, "CONTENT");
-    }
-
-    public void AddData(String newEntry , String colName){
-        boolean intertData = mDatabaseHelper.addData(newEntry, colName);
-
-        if(intertData){
-            toastMessage("Data Successfully Inserted" );
-        }else{
-            toastMessage("Something went wrong, please debug");
-        }
-    }
+//    private void createNewToDo() {
+//
+//        homeActivity.AddData(titleNote, "TITLE");
+//      //  homeActivity.AddData(contentNote, "CONTENT");
+//    }
 
     public void saveNewNote(){
         Toast.makeText(getApplicationContext(),"Note Saved!",Toast.LENGTH_LONG).show();
@@ -182,13 +202,13 @@ public class ToDoListActivity extends AppCompatActivity implements View.OnClickL
         stringDate =  this.getDateEditText().getText().toString();
         stringTime = this.getTimeEditText().getText().toString();
 
-        Log.i(TAG, "Debug: Note!->" + contentNote + ",  " + titleNote );
-        Log.i(TAG, "Debug: Time/Date!->" + stringDate + stringTime);
+        Log.i(TAG, "Edit Debug: Note!->" + contentNote + titleNote + alarmTimeNote);
+        Log.i(TAG, "Edit Debug: Time/Date!->" + stringDate + stringTime);
 
-       //=====// alarmReceiver.start(mYear, mMonth, mDay, mHour, mMinute);
+        //=====// alarmReceiver.start(mYear, mMonth, mDay, mHour, mMinute);
 
-      //  homeActivity.createNewNote(titleNote, contentNote, stringDate, stringTime);
-       // homeActivity.addToArrayList(titleNote, contentNote);
+        //  homeActivity.createNewNote(titleNote, contentNote, stringDate, stringTime);
+        // homeActivity.addToArrayList(titleNote, contentNote);
     }
 
     void goToHomeActivity(){
@@ -228,31 +248,32 @@ public class ToDoListActivity extends AppCompatActivity implements View.OnClickL
 //        }
 
         //Display  notification!
-        alarmIntent = new Intent(ToDoListActivity.this, Alarm_Receiver.class);
+        alarmIntent = new Intent(EditDataActivity.this, Alarm_Receiver.class);
         alarmIntent.putExtra("notificationMsg",titleNote);
-        pendingIntent = PendingIntent.getBroadcast(ToDoListActivity.this, 1, alarmIntent, 0);
-        Log.i("ToDoActivity", "Alarm Created at "  + cal_alarm.getTimeInMillis() );
-        Log.i("ToDoActivity","Current Time: " + System.currentTimeMillis());
+        pendingIntent = PendingIntent.getBroadcast(EditDataActivity.this, 0, alarmIntent, 0);
+        Log.i("ToDoActivity", "Edit: Alarm Created at "  + cal_alarm.getTimeInMillis() );
+        Log.i("ToDoActivity","Edit: Current Time: " + System.currentTimeMillis());
         //Fire alarm at the time specified
         //cal_alarm should be the calendar variable
         manager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime()+6000, pendingIntent);
-       // manager.set(AlarmManager.RTC_WAKEUP,cal_alarm.getTimeInMillis(), pendingIntent);
+        // manager.set(AlarmManager.RTC_WAKEUP,cal_alarm.getTimeInMillis(), pendingIntent);
     }
 
     //Get the Information of the note (title, content, date)
     private EditText getNoteContentEditText() {
-        return (EditText) this.findViewById(R.id.etNoteContent);
+        return (EditText) this.findViewById(R.id.etNoteContentEdit);
     }
     private EditText getTitleNoteEditText() {
-        return (EditText) this.findViewById(R.id.tvNoteTitle);
+        return (EditText) this.findViewById(R.id.tvNoteTitleEdit);
     }
 
     private EditText getDateEditText() {
-        return (EditText) this.findViewById(R.id.in_date);
+        return (EditText) this.findViewById(R.id.in_dateEdit);
     }
     private EditText getTimeEditText() {
-        return (EditText) this.findViewById(R.id.in_time);
+        return (EditText) this.findViewById(R.id.in_timeEdit);
     }
+
 
     private void toastMessage(String msg){
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
