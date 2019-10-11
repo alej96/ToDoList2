@@ -43,6 +43,7 @@ public class EditDataActivity extends AppCompatActivity implements View.OnClickL
     String stringDate, stringTime;
     private int mYear, mMonth, mDay, mHour, mMinute;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
