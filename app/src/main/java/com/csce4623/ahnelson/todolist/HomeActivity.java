@@ -2,8 +2,10 @@ package com.csce4623.ahnelson.todolist;
 
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -27,10 +29,11 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
   //   ToDoListActivity toDoListAct = new ToDoListActivity();
     ListView listNotes;
     ArrayList<String> arrayNotes;
+    ArrayList<String> tempArrayNotes;
     ArrayAdapter<String> adapter;
 
     String hmTitle, hmContent, hmTime, hmDate;
-    int listID;
+    int listID, arrayPosition, lastRowDb;
 
     DatabaseHelper mDatabaseHelper;
 
@@ -41,6 +44,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     public static final String TABLE_COL_DATE = "DATE";
     public static final String TABLE_COL_TIME = "TIME";
     public static final Boolean TABLE_COL_DONE =  false;
+
+    NetworkCheck networkBroadcastReceiver = new NetworkCheck();
 
     public HomeActivity(){
 
@@ -84,6 +89,19 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(networkBroadcastReceiver, filter);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unregisterReceiver(networkBroadcastReceiver);
+    }
+
     private void populateListView() {
 
 
@@ -103,10 +121,11 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
             if(tempData != null)
             {
-                //arrayNotes.add(tempIdnbr + ": " + tempData);
+              //  arrayNotes.add(tempIdnbr + ": " + tempData);
+
+               // tempArrayNotes.add(tempIdnbr);
                 arrayNotes.add(tempData);
             }
-
         }
         listID = data.getCount();
 
@@ -132,7 +151,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                         String name = adapterView.getItemAtPosition(position).toString();
 
 
-                        Log.i(TAG, "Item List Clicked! Name: " + name +
+                        Log.i(TAG, "Debug Item List Clicked! Name: " + name +
                                 " At position: " + position + " and ID: " + id);
 
                         Cursor data = mDatabaseHelper.getItemID(name); //get the id associated with that name
@@ -145,6 +164,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                       //  Cursor singleRow = mDatabaseHelper.getDataPoint(itemID);
                        // hmContent = singleRow.getString(singleRow.getColumnIndex(TABLE_COL_CONTENT)); //content column
                             hmContent = mDatabaseHelper.getDataPoint(itemID, TABLE_COL_CONTENT);
+                            hmDate = mDatabaseHelper.getDataPoint(itemID, TABLE_COL_DATE);
+                            hmTime = mDatabaseHelper.getDataPoint(itemID, TABLE_COL_TIME);
                         if (itemID > -1) {
                             Log.d(TAG, "onItemClick: The ID is: " + itemID);
                             Intent editScreenIntent = new Intent(HomeActivity.this, EditDataActivity.class);
@@ -152,6 +173,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                             editScreenIntent.putExtra("positionArray", position );
                             editScreenIntent.putExtra("titleText", name);
                             editScreenIntent.putExtra("contentText", hmContent);
+                            editScreenIntent.putExtra("dateText", hmDate);
+                            editScreenIntent.putExtra("timeText", hmTime);
                             startActivityForResult(editScreenIntent, 2);
                            // goEditDataActivity();
                         } else {
@@ -177,17 +200,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 this.goToDoListActivity();
              //  this.createNewNote(hmTitle, hmContent, hmDate, hmTime);
                 break;
-            //If delete note, call deleteNewestNote()
-//            case R.id.btnDeleteNote:
-//                deleteNewestNote();
-//                break;
-            case R.id.btnSave:
-
-                break;
-            case R.id.all_toDo_lists:
-
-
-            //This shouldn't happen
+               //This shouldn't happen
             default:
                 break;
         }
@@ -215,9 +228,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         if (requestCode == 1) {
             if(resultCode == RESULT_OK) {
                 hmTitle = data.getStringExtra("titleText");
-//                hmContent  = data.getStringExtra("contentText");
-//                hmDate = data.getStringExtra("dateText");
-//                hmTime = data.getStringExtra("timeText");
+                hmContent  = data.getStringExtra("contentText");
+                hmDate = data.getStringExtra("dateText");
+                hmTime = data.getStringExtra("timeText");
 
                 listID =  data.getIntExtra("listID", -1);
 
@@ -229,9 +242,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         else if (requestCode == 2) {
             if(resultCode == RESULT_OK) {
                 hmTitle = data.getStringExtra("titleText");
-//                hmContent  = data.getStringExtra("contentText");
-//                hmDate = data.getStringExtra("dateText");
-//                hmTime = data.getStringExtra("timeText");
+                hmContent  = data.getStringExtra("contentText");
+                hmDate = data.getStringExtra("dateText");
+                hmTime = data.getStringExtra("timeText");
 
                 listID = data.getIntExtra("listID", -1);
                 //Add the resutls to the 2D Array

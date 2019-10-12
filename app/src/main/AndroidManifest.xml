@@ -36,8 +36,15 @@
             android:name=".model.Alarm_Receiver"
             android:enabled="true"
             android:exported="true"
-            android:process=":remote"
-            />
+            android:process=":remote" >
+
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.BOOT_COMPLETED"/>-->
+<!--                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>-->
+
+<!--            </intent-filter>-->
+        </receiver>
+
 
     </application>
 

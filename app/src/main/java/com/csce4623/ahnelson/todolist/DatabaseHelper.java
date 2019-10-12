@@ -21,7 +21,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // Authority is the package name
     private static final String AUTHORITY = "com.csce4623.ahnelson.todolist.todoprovider";
     //TABLE_NAME is defined as ToDoList
-    private static final String TABLE_NAME = "ToDoList2";
+    private static final String TABLE_NAME = "ToDoList3";
     //Create a CONTENT_URI for use by other classes
     public static final Uri CONTENT_URI =
             Uri.parse("content://" + AUTHORITY + "/"+TABLE_NAME);
@@ -43,9 +43,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
 
+/*        String createTable = "CREATE TABLE " + TABLE_NAME + " (ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                TABLE_COL_TITLE + " TEXT NOT NULL, " +
+                TABLE_COL_CONTENT + " TEXT NOT NULL);" ;*/
+
+
         String createTable = "CREATE TABLE " + TABLE_NAME + " (ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 TABLE_COL_TITLE + " TEXT NOT NULL, " +
-                TABLE_COL_CONTENT + " TEXT NOT NULL);" ;
+                TABLE_COL_CONTENT + " TEXT NOT NULL, " +
+                TABLE_COL_DATE +  " TEXT NOT NULL, " +
+                TABLE_COL_TIME + " TEXT NOT NULL);" ;
     Log.i(TAG, "Table Created: " + createTable);
         db.execSQL(createTable);
 
@@ -87,6 +94,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String query = "INSERT INTO " + TABLE_NAME + " ( " +
                TABLE_COL_TITLE + " , " + TABLE_COL_CONTENT + " ) VALUES ( '" +
                title + "' , '" + content +"' );";
+        Log.d(TAG, "updateName: query: " + query);
+        db.execSQL(query);
+    }
+
+    public void insertData(String title, String content, String date, String time){
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query = "INSERT INTO " + TABLE_NAME + " ( " +
+                TABLE_COL_TITLE + " , " + TABLE_COL_CONTENT + " , " +
+                TABLE_COL_DATE  + " , " + TABLE_COL_TIME +" ) " +
+
+                "VALUES ( '" + title + "' , '" + content +  "' , '" +
+                        date +  "' , '" + time + "' );";
         Log.d(TAG, "updateName: query: " + query);
         db.execSQL(query);
     }
@@ -136,6 +156,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(query);
     }
 
+    /**
+     * Get data point base in ID from database
+     */
+
+    public String getDataPoint(int itemID, String colName) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query = "SELECT " + colName  +" FROM " + TABLE_NAME +
+                " WHERE " + TABLE_COL_ID + " = '" + itemID + "';";
+
+        Cursor data = db.rawQuery(query, null);
+        data.moveToFirst();
+        String output =  data.getString(data.getColumnIndex(colName));
+        return output;
+    }
+
     public Cursor getDataPoint(int itemID) {
 
         SQLiteDatabase db = this.getWritableDatabase();
@@ -145,19 +181,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor data = db.rawQuery(query, null);
         return data;
     }
-    public String getDataPoint(int itemID, String colName) {
-
-        SQLiteDatabase db = this.getWritableDatabase();
-        String query = "SELECT " + colName  +" FROM " + TABLE_NAME +
-                " WHERE " + TABLE_COL_ID + " = '" + itemID + "';";
-
-        Cursor data = db.rawQuery(query, null);
-        data.moveToFirst();
-        String output =  data.getString(data.getColumnIndex(TABLE_COL_CONTENT));
-        return output;
-    }
-
-
     /**
      * Last Row from database
      */

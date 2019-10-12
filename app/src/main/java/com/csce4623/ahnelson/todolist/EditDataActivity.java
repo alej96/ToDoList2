@@ -34,7 +34,7 @@ public class EditDataActivity extends AppCompatActivity implements View.OnClickL
     Intent alarmIntent;
 
     String contentNote , titleNote, alarmTimeNote;
-    String  oldTitle, oldContent;
+    String  oldTitle, oldContent, oldDate, oldTime;
     int listID , positionArray;
 
     //  Button btnDatePicker, btnTimePicker;
@@ -72,6 +72,7 @@ public class EditDataActivity extends AppCompatActivity implements View.OnClickL
         findViewById(R.id.btn_dateEdit).setOnClickListener(this);
         findViewById(R.id.btn_timeEdit).setOnClickListener(this);
         findViewById(R.id.btnDeleteEdit).setOnClickListener(this);
+        findViewById(R.id.btnDoneEdit).setOnClickListener(this);
 
         txtTitle = (EditText) findViewById(R.id.tvNoteTitleEdit);
         txtContent = (EditText) findViewById(R.id.etNoteContentEdit);
@@ -93,9 +94,13 @@ public class EditDataActivity extends AppCompatActivity implements View.OnClickL
         positionArray = receivedIntent.getIntExtra("positionArray", 0);
         oldTitle = receivedIntent.getStringExtra("titleText");
         oldContent = receivedIntent.getStringExtra("contentText");
+        oldDate = receivedIntent.getStringExtra("dateText");
+        oldTime = receivedIntent.getStringExtra("timeText");
 
         txtTitle.setText(oldTitle);
         txtContent.setText(oldContent);
+        txtDate.setText(oldDate);
+        txtTime.setText(oldTime);
 
 
     }
@@ -112,6 +117,11 @@ public class EditDataActivity extends AppCompatActivity implements View.OnClickL
                 contentNote = txtContent.getText().toString();
                 mDatabaseHelper.updateData(contentNote, listID, oldContent, TABLE_COL_CONTENT);
 
+                stringDate = txtDate.getText().toString();
+                mDatabaseHelper.updateData(stringDate, listID, oldDate, TABLE_COL_DATE);
+                stringTime = txtTime.getText().toString();
+                mDatabaseHelper.updateData(stringTime, listID, oldTime, TABLE_COL_TIME);
+
                 saveEditedNote();
 
                 //Start notification
@@ -125,19 +135,30 @@ public class EditDataActivity extends AppCompatActivity implements View.OnClickL
 
              //   listID++;
                 intent.putExtra("listID", listID);
+                intent.putExtra("positionArray", positionArray);
 
                 setResult(RESULT_OK, intent);
                 finish();
                 break;
 
-            case R.id.btnDeleteEdit:
+            case R.id.btnDeleteEdit :
                 titleNote = txtTitle.getText().toString();
                 mDatabaseHelper.deleteName(listID, titleNote);
 
                // txtTitle.setText("");
-                toastMessage("Data removed from Database");
+                toastMessage("Task Deleted");
 
-                setResult(RESULT_OK);
+               // setResult(RESULT_OK);
+                finish();
+                break;
+            case R.id.btnDoneEdit :
+                titleNote = txtTitle.getText().toString();
+
+                Log.i("Debug","ID: " + listID + " " + titleNote);
+                mDatabaseHelper.deleteName(listID, titleNote);
+
+                toastMessage("Congrats! Task Completed!");
+
                 finish();
                 break;
             //This shouldn't happen
@@ -200,13 +221,13 @@ public class EditDataActivity extends AppCompatActivity implements View.OnClickL
 
 
     public void saveEditedNote(){
-        Toast.makeText(getApplicationContext(),"Edited Note Saved!",Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(),"Task Saved!",Toast.LENGTH_LONG).show();
         contentNote = this.getNoteContentEditText().getText().toString();
         titleNote = this.getTitleNoteEditText().getText().toString();
         stringDate =  this.getDateEditText().getText().toString();
         stringTime = this.getTimeEditText().getText().toString();
 
-        Log.i(TAG, "Edit Debug: Note!->" + contentNote + titleNote + alarmTimeNote);
+        Log.i(TAG, "Edit Debug: Note!->" + contentNote + " , " + titleNote );
         Log.i(TAG, "Edit Debug: Time/Date!->" + stringDate + stringTime);
 
     }
@@ -241,15 +262,15 @@ public class EditDataActivity extends AppCompatActivity implements View.OnClickL
 
         //Display  notification!
         alarmIntent = new Intent(EditDataActivity.this, Alarm_Receiver.class);
-        alarmIntent.putExtra("notificationMsg",titleNote);
+        alarmIntent.putExtra("titleText", titleNote);
         alarmIntent.putExtra("positionArray",positionArray);
-        pendingIntent = PendingIntent.getBroadcast(EditDataActivity.this, positionArray, alarmIntent, 0);
+        pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), positionArray, alarmIntent, 0);
         Log.i("ToDoActivity", "Edit: Alarm Created at "  + cal_alarm.getTimeInMillis() );
         Log.i("ToDoActivity","Edit: Current Time: " + System.currentTimeMillis());
         //Fire alarm at the time specified
         //cal_alarm should be the calendar variable
-        manager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime()+6000, pendingIntent);
-        // manager.set(AlarmManager.RTC_WAKEUP,cal_alarm.getTimeInMillis(), pendingIntent);
+       // manager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime()+6000, pendingIntent);
+         manager.set(AlarmManager.RTC_WAKEUP,cal_alarm.getTimeInMillis(), pendingIntent);
     }
 
     //Get the Information of the note (title, content, date)

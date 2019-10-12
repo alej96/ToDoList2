@@ -175,14 +175,15 @@ public class ToDoListActivity extends AppCompatActivity implements View.OnClickL
        // AddData(titleNote, TABLE_COL_TITLE);
         //AddData(contentNote, TABLE_COL_CONTENT);
       //  homeActivity.AddData(contentNote, "CONTENT");
-        mDatabaseHelper.insertData(titleNote, contentNote);
+        //mDatabaseHelper.insertData(titleNote, contentNote);
+        mDatabaseHelper.insertData(titleNote, contentNote, stringDate, stringTime);
     }
 
     public void AddData(String newEntry , String colName){
         boolean intertData = mDatabaseHelper.addData(newEntry, colName);
 
         if(intertData){
-            toastMessage("Data Successfully Inserted" );
+          //  toastMessage("Data Successfully Inserted" );
         }else{
             toastMessage("Something went wrong, please debug");
         }
@@ -193,7 +194,7 @@ public class ToDoListActivity extends AppCompatActivity implements View.OnClickL
     }
 
     public void saveNewNote(){
-        Toast.makeText(getApplicationContext(),"Note Saved!",Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(),"New Task Created!",Toast.LENGTH_LONG).show();
         contentNote = this.getNoteContentEditText().getText().toString();
         titleNote = this.getTitleNoteEditText().getText().toString();
         stringDate =  this.getDateEditText().getText().toString();
@@ -246,7 +247,7 @@ public class ToDoListActivity extends AppCompatActivity implements View.OnClickL
 
         //Display  notification!
         alarmIntent = new Intent(ToDoListActivity.this, Alarm_Receiver.class);
-        alarmIntent.putExtra("notificationMsg",titleNote);
+        alarmIntent.putExtra("titleText",titleNote);
         alarmIntent.putExtra("positionArray",positionArray);
 
         pendingIntent = PendingIntent.getBroadcast(ToDoListActivity.this, positionArray, alarmIntent, 0);
@@ -254,8 +255,8 @@ public class ToDoListActivity extends AppCompatActivity implements View.OnClickL
         Log.i("ToDoActivity","Current Time: " + System.currentTimeMillis());
         //Fire alarm at the time specified
         //cal_alarm should be the calendar variable
-       manager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime()+6000, pendingIntent);
-       // manager.set(AlarmManager.RTC_WAKEUP,cal_alarm.getTimeInMillis(), pendingIntent);
+//       manager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime()+6000, pendingIntent);
+        manager.set(AlarmManager.RTC_WAKEUP,cal_alarm.getTimeInMillis(), pendingIntent);
     }
 
     //Get the Information of the note (title, content, date)

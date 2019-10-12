@@ -9,11 +9,13 @@ import android.content.ContextWrapper;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.content.Intent;
+import android.util.Log;
 
 
 public class NotificationHelper extends ContextWrapper {
     public static final String channelID = "channelID";
     public static final String channelName = "Channel Name";
+    String message;
 
     private NotificationManager mManager;
 
@@ -51,12 +53,13 @@ public class NotificationHelper extends ContextWrapper {
     public NotificationCompat.Builder getChannelNotification(String Notetitle, int codeID) {
 
         Intent resultIntent = new Intent(this, HomeActivity.class);
+        message = resultIntent.getStringExtra("titleText");
+       // Log.i("Notification Debug: " , message);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(this, codeID, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-
         return new NotificationCompat.Builder(getApplicationContext(), channelID)
-                .setContentTitle("Reminder!")
-                .setContentText(Notetitle)
+                .setContentTitle("Reminder! ")
+                .setContentText("Task Due " )
                 .setSmallIcon(R.drawable.ic_android)
                 .setAutoCancel(true)
                 .setContentIntent(resultPendingIntent);
